@@ -40,7 +40,7 @@ class api_beahaviour(Resource):
         abort_if_country_doesnt_exist(country)
         abort_if_date_format_is_invalid(init_date, end_date)
 
-        ### create the request with pymongo
+        ### create the request with pymongo (output : les donnees agregées)
 
 
         ### add value to the request
