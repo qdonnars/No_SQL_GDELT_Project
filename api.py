@@ -11,13 +11,6 @@ Horizon_considered = ['01-01-2016', '01-05-2016']
 
 Horizon_considered = [dt.datetime.strptime(date, '%d-%m-%Y').date() for date in Horizon_considered]
 
-# ammené à disparaitre permet de tester la sortie sans interface pymongo
-Country_linked = {
-    'country1': {'country': 'FRANCE'},
-    'country2': {'country': 'SPAIN'},
-    'country3': {'country': 'ITALY'},
-}
-
 ## foncitons permettant de retourner des messages d'erreurs dans un dictionaire sans faire crasher le front
 def abort_if_country_doesnt_exist(country):
     if country not in Country_list:
@@ -45,15 +38,9 @@ parser.add_argument('end_date')
 
 # Requette
 class api_beahaviour(Resource):
-    def get(self):
-        return {'message' : 'hello sunshine'} , 200
-
-    def post(self):
+    def get(self, country, init_date, end_date):
         ### On enregistre en local les variables pour pouvoir traviller dessu
-        args = parser.parse_args()
-        country = args['country']
-        init_date = args['init_date']
-        end_date = args['end_date']
+        # args = parser.parse_args() # je crois qu'il n'y en a pas a parser
 
         ### on test les variables
         abort_if_country_doesnt_exist(country)
@@ -69,15 +56,19 @@ class api_beahaviour(Resource):
         country = {'country': country}
         init_date = {'init_date': init_date}
         end_date = {'end_date': end_date}
-        #awnser = {country, init_date, end_date}
-        awnser = Country_linked
+        awnser = {country, init_date, end_date}
         return awnser, 201
+
+class api_beahaviour2(Resource):
+    def get(self):
+        return {'message' : 'hello sunshine'} , 200
 
 
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(api_beahaviour, '/')
+api.add_resource(api_beahaviour, '/test/<country>/<init_date>/<end_date>')
+api.add_resource(api_beahaviour2, '/')
 
 ## je ne comprend pas cette commande
 if __name__ == '__main__':
