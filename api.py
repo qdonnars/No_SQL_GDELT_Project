@@ -10,9 +10,9 @@ import unicodedata
 app = Flask(__name__)
 api = Api(app)
 
-# des listes permettant de tester là cohérences des données en entrée
-Country_list = ['FRANCE', 'ITALY', 'SPAIN']
-Horizon_considered = ['01-01-2017', '31-12-2017']
+# des listes permettant de tester la coherences des donnees en entree
+Country_list = ['FR', 'US', 'SP']
+Horizon_considered = ['201701', '201712']
 
 Horizon_considered = [dt.datetime.strptime(date, '%Y%m') for date in Horizon_considered]
 
@@ -41,13 +41,13 @@ class api_beahaviour(Resource):
         # args = parser.parse_args() # je crois qu'il n'y en a pas a parser
 
         ### on test les variables   , init_date, end_date
-        abort_if_country_doesnt_exist(country)
+        abort_if_country_doesnt_exist(country1)
+        abort_if_country_doesnt_exist(country2)
         abort_if_date_format_is_invalid(month)
 
-        ### create the request with pymongo (output : les donnees agregées)
+        ### create the request with pymongo (output : les donnees agregees)
         def Impact(country1, country2, month):
             [imp_pos, imp_neg, mention] = [0, 0, 0]
-            month = month+201700
             # Taper le nom du host
             client = MongoClient()
             # On recupere le dataset
@@ -67,8 +67,8 @@ class api_beahaviour(Resource):
             return imp_neg, imp_pos, mention
                 
         ### add value to the request
-        imp1_C1_C2_pos, imp1_C1_C2_neg, mention_C1_C2= Impact(country1, country2, month)
-        imp1_C2_C1_pos, imp1_C2_C1_neg, mention_C2_C1 = Impact(country2, country1, month)
+        imp1_C1_C2_pos, imp1_C1_C2_neg, mention_C1_C2= Impact(country1, country2, int(month))
+        imp1_C2_C1_pos, imp1_C2_C1_neg, mention_C2_C1 = Impact(country2, country1, int(month))
 
 
         ### create the awnser
@@ -89,7 +89,7 @@ class api_beahaviour2(Resource):
 ##
 ## Actually setup the Api resource routing here
 ##
-api.add_resource(api_beahaviour, '/options/<country1>/<country2/<month>')
+api.add_resource(api_beahaviour, '/options/<country1>/<country2>/<month>')
 api.add_resource(api_beahaviour2, '/')
 
 ## je ne comprend pas cette commande
