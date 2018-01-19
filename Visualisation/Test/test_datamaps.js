@@ -118,15 +118,16 @@ zoom.bubbles([
 
 var select = document.getElementById("selectCountry1");
 var select2 = document.getElementById("selectCountry2");
-var pays1 = select.value
-var pays2 = select2.value
+var pays1 = select.value;
+var pays2 = select2.value;
+
+
+
 var series = [
         [pays1,80],[pays2,150]];
 
 
     // Datamaps expect data in format:
-    //{ "USA": { "fillColor": "#42a844", numberOfWhatever: 75},
-    //  "FRA": { "fillColor": "#8dc386", numberOfWhatever: 43 } }
     var dataset = {};
 
     // We need to colorize every country based on "numberOfWhatever"
@@ -179,6 +180,15 @@ var series = [
         }
     });
     document.getElementsByTagName("svg")[0].style.overflow="visible";
+    impact(select.value, select2.value);
+    var pays11 = select.options[select.selectedIndex].text;
+	var pays22 = select2.options[select2.selectedIndex].text;
+
+	document.getElementById('POS_C1_C2').innerHTML = "Positive Impact of "+pays11+" on "+pays22+ " :";
+	document.getElementById('NEG_C1_C2').innerHTML = "Negative Impact of "+pays11+" on "+pays22+ " :";
+	document.getElementById('POS_C2_C1').innerHTML = "Positive Impact of "+pays22+" on "+pays11+ " :";
+	document.getElementById('NEG_C2_C1').innerHTML = "Negative Impact of "+pays22+" on "+pays11+ " :";
+
 }
 
 function data(){
@@ -2193,5 +2203,292 @@ for(var j = 0; j < data["objects"]["world"]["geometries"].length; j++) {
     select2.appendChild(el2);
 }
 
+
 }
 
+function impact(country1, country2) {
+            var convCountry = {'ABW': 'AW',
+                     'AFG': 'AF',
+                     'AGO': 'AO',
+                     'AIA': 'AI',
+                     'ALB': 'AL',
+                     'AND': 'AD',
+                     'ARE': 'AE',
+                     'ARG': 'AR',
+                     'ARM': 'AM',
+                     'ASM': 'AS',
+                     'ATA': 'AQ',
+                     'ATF': 'TF',
+                     'ATG': 'AG',
+                     'AUS': 'AU',
+                     'AUT': 'AT',
+                     'AZE': 'AZ',
+                     'BDI': 'BI',
+                     'BEL': 'BE',
+                     'BEN': 'BJ',
+                     'BES': 'BQ',
+                     'BFA': 'BF',
+                     'BGD': 'BD',
+                     'BGR': 'BG',
+                     'BHR': 'BH',
+                     'BHS': 'BS',
+                     'BIH': 'BA',
+                     'BLM': 'BL',
+                     'BLR': 'BY',
+                     'BLZ': 'BZ',
+                     'BMU': 'BM',
+                     'BOL': 'BO',
+                     'BRA': 'BR',
+                     'BRB': 'BB',
+                     'BRN': 'BN',
+                     'BTN': 'BT',
+                     'BVT': 'BV',
+                     'BWA': 'BW',
+                     'CAF': 'CF',
+                     'CAN': 'CA',
+                     'CCK': 'CC',
+                     'CHE': 'CH',
+                     'CHL': 'CL',
+                     'CHN': 'CN',
+                     'CIV': 'CI',
+                     'CMR': 'CM',
+                     'COD': 'CD',
+                     'COG': 'CG',
+                     'COK': 'CK',
+                     'COL': 'CO',
+                     'COM': 'KM',
+                     'CPV': 'CV',
+                     'CRI': 'CR',
+                     'CUB': 'CU',
+                     'CUW': 'CW',
+                     'CXR': 'CX',
+                     'CYM': 'KY',
+                     'CYP': 'CY',
+                     'CZE': 'CZ',
+                     'DEU': 'DE',
+                     'DJI': 'DJ',
+                     'DMA': 'DM',
+                     'DNK': 'DK',
+                     'DOM': 'DO',
+                     'DZA': 'DZ',
+                     'ECU': 'EC',
+                     'EGY': 'EG',
+                     'ERI': 'ER',
+                     'ESH': 'EH',
+                     'ESP': 'ES',
+                     'EST': 'EE',
+                     'ETH': 'ET',
+                     'FIN': 'FI',
+                     'FJI': 'FJ',
+                     'FLK': 'FK',
+                     'FRA': 'FR',
+                     'FRO': 'FO',
+                     'FSM': 'FM',
+                     'GAB': 'GA',
+                     'GBR': 'GB',
+                     'GEO': 'GE',
+                     'GGY': 'GG',
+                     'GHA': 'GH',
+                     'GIB': 'GI',
+                     'GIN': 'GN',
+                     'GLP': 'GP',
+                     'GMB': 'GM',
+                     'GNB': 'GW',
+                     'GNQ': 'GQ',
+                     'GRC': 'GR',
+                     'GRD': 'GD',
+                     'GRL': 'GL',
+                     'GTM': 'GT',
+                     'GUF': 'GF',
+                     'GUM': 'GU',
+                     'GUY': 'GY',
+                     'HKG': 'HK',
+                     'HMD': 'HM',
+                     'HND': 'HN',
+                     'HRV': 'HR',
+                     'HTI': 'HT',
+                     'HUN': 'HU',
+                     'IDN': 'ID',
+                     'IMN': 'IM',
+                     'IND': 'IN',
+                     'IOT': 'IO',
+                     'IRL': 'IE',
+                     'IRN': 'IR',
+                     'IRQ': 'IQ',
+                     'ISL': 'IS',
+                     'ISR': 'IL',
+                     'ITA': 'IT',
+                     'JAM': 'JM',
+                     'JEY': 'JE',
+                     'JOR': 'JO',
+                     'JPN': 'JP',
+                     'KAZ': 'KZ',
+                     'KEN': 'KE',
+                     'KGZ': 'KG',
+                     'KHM': 'KH',
+                     'KIR': 'KI',
+                     'KNA': 'KN',
+                     'KOR': 'KR',
+                     'KWT': 'KW',
+                     'LAO': 'LA',
+                     'LBN': 'LB',
+                     'LBR': 'LR',
+                     'LBY': 'LY',
+                     'LCA': 'LC',
+                     'LIE': 'LI',
+                     'LKA': 'LK',
+                     'LSO': 'LS',
+                     'LTU': 'LT',
+                     'LUX': 'LU',
+                     'LVA': 'LV',
+                     'MAC': 'MO',
+                     'MAF': 'MF',
+                     'MAR': 'MA',
+                     'MCO': 'MC',
+                     'MDA': 'MD',
+                     'MDG': 'MG',
+                     'MDV': 'MV',
+                     'MEX': 'MX',
+                     'MHL': 'MH',
+                     'MKD': 'MK',
+                     'MLI': 'ML',
+                     'MLT': 'MT',
+                     'MMR': 'MM',
+                     'MNE': 'ME',
+                     'MNG': 'MN',
+                     'MNP': 'MP',
+                     'MOZ': 'MZ',
+                     'MRT': 'MR',
+                     'MSR': 'MS',
+                    'MTQ': 'MQ',
+                    'MUS': 'MU',
+                    'MWI': 'MW',
+                    'MYS': 'MY',
+                    'MYT': 'YT',
+                    'NCL': 'NC',
+                    'NER': 'NE',
+                    'NFK': 'NF',
+                    'NGA': 'NG',
+                    'NIC': 'NI',
+                    'NIU': 'NU',
+                    'NLD': 'NL',
+                    'NOR': 'NO',
+                    'NPL': 'NP',
+                    'NRU': 'NR',
+                    'NZL': 'NZ',
+                    'OMN': 'OM',
+                    'PAK': 'PK',
+                    'PAN': 'PA',
+                    'PCN': 'PN',
+                    'PER': 'PE',
+                    'PHL': 'PH',
+                    'PLW': 'PW',
+                    'PNG': 'PG',
+                    'POL': 'PL',
+                    'PRI': 'PR',
+                    'PRK': 'KP',
+                    'PRT': 'PT',
+                    'PRY': 'PY',
+                    'PSE': 'PS',
+                    'PYF': 'PF',
+                    'QAT': 'QA',
+                    'REU': 'RE',
+                    'ROU': 'RO',
+                    'RUS': 'RU',
+                    'RWA': 'RW',
+                    'SAU': 'SA',
+                    'SDN': 'SD',
+                    'SEN': 'SN',
+                    'SGP': 'SG',
+                    'SGS': 'GS',
+                    'SHN': 'SH',
+                    'SJM': 'SJ',
+                    'SLB': 'SB',
+                    'SLE': 'SL',
+                    'SLV': 'SV',
+                    'SMR': 'SM',
+                    'SOM': 'SO',
+                    'SPM': 'PM',
+                    'SRB': 'RS',
+                    'SSD': 'SS',
+                    'STP': 'ST',
+                    'SUR': 'SR',
+                    'SVK': 'SK',
+                    'SVN': 'SI',
+                    'SWE': 'SE',
+                    'SWZ': 'SZ',
+                    'SXM': 'SX',
+                    'SYC': 'SC',
+                    'SYR': 'SY',
+                    'TCA': 'TC',
+                    'TCD': 'TD',
+                    'TGO': 'TG',
+                    'THA': 'TH',
+                    'TJK': 'TJ',
+                    'TKL': 'TK',
+                    'TKM': 'TM',
+                    'TLS': 'TL',
+                    'TON': 'TO',
+                    'TTO': 'TT',
+                    'TUN': 'TN',
+                    'TUR': 'TR',
+                    'TUV': 'TV',
+                    'TWN': 'TW',
+                    'TZA': 'TZ',
+                    'UGA': 'UG',
+                    'UKR': 'UA',
+                    'UMI': 'UM',
+                    'URY': 'UY',
+                    'USA': 'US',
+                    'UZB': 'UZ',
+                    'VAT': 'VA',
+                    'VCT': 'VC',
+                    'VEN': 'VE',
+                    'VGB': 'VG',
+                    'VIR': 'VI',
+                    'VNM': 'VN',
+                    'VUT': 'VU',
+                    'WLF': 'WF',
+                    'WSM': 'WS',
+                    'YEM': 'YE',
+                    'ZAF': 'ZA',
+                    'ZMB': 'ZM',
+                    'ZWE': 'ZW'};
+
+                var newURL='http://localhost:5000/'+convCountry[country1]+'/'+convCountry[country2]+'/201703';
+
+
+                $.ajax({
+                     url: newURL,
+                     type: 'GET',
+                     dataType: 'json',
+                     contentType: 'application/json',
+                     charset: 'utf-8',
+                     beforeSend:  function () {
+                         document.getElementById("imagerefresh").style.display="block";
+                         document.getElementById("results").style.display="none";
+                     },
+                     success: function (data, textStatus, xhr) {
+                        document.getElementById("imagerefresh").style.display="none";
+                         document.getElementById("results").style.display="block";
+                         console.log(data);
+                         document.getElementById("imp1_C1_C2_pos").value=data["imp1_C1_C2_pos"]
+                         document.getElementById("imp1_C1_C2_neg").value=data["imp1_C1_C2_neg"]
+                         document.getElementById("imp1_C2_C1_pos").value=data["imp1_C2_C1_pos"]
+                         document.getElementById("imp1_C2_C1_neg").value=data["imp1_C2_C1_neg"]
+
+                         /*if (data["imp1_C1_C2_pos"] > data["imp1_C1_C2_neg"]){
+                         	document.getElementById("imp1_C1_C2_pos").style.font_weight="900";
+                         	document.getElementById("imp1_C1_C2_pos").style.font_size="20pt";
+                         }
+                         else{
+							document.getElementById("imp1_C1_C2_neg").style.font_weight="900";
+							document.getElementById("imp1_C1_C2_neg").style.font_size="20pt";
+
+                         }*/
+                     },
+                     error: function (xhr, textStatus, errorThrown) {
+                         console.log('Error in Operation');
+                     }
+                 });
+}
