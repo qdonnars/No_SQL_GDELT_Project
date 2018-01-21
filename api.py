@@ -54,6 +54,8 @@ def abort_if_date_format_is_invalid(month):
 class api_beahaviour(Resource):
     def get(self, country1, country2, month):
 
+        startTime = dt.datetime.now()
+
         ### On test les variables, init_date, end_date
         abort_if_country_doesnt_exist(country1)
         abort_if_country_doesnt_exist(country2)
@@ -61,6 +63,7 @@ class api_beahaviour(Resource):
 
         ### Create the request with pymongo (output : les données agregées)
         def Impact(country1, country2, month):
+
             [imp_pos, imp_neg, mention] = [0, 0, 0]
             
             client = MongoClient(MongoIPClient, Port)
@@ -111,6 +114,8 @@ class api_beahaviour(Resource):
                   'imp1_C2_C1_neg' : imp1_C2_C1_neg,
                   'mention_C2_C1' : mention_C2_C1
                   }
+
+        print(dt.datetime.now() - startTime)
 
         return awnser, 201
     
