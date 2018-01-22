@@ -1,194 +1,76 @@
 function start(){
     d3.select("svg").remove();
 
-  /*var map = new Datamap({element: document.getElementById('container')});
- 
-	var defaultOptions = {
-    scope: 'world', //currently supports 'usa' and 'world', however with custom map data you can specify your own
-    setProjection: setProjection, //returns a d3 path and projection functions
-    projection: 'equirectangular', //style of projection to be used. try "mercator"
-    height: null, //if not null, datamaps will grab the height of 'element'
-    width: null, //if not null, datamaps will grab the width of 'element'
-    responsive: false, //if true, call `resize()` on the map object when it should adjust it's size
-    done: function() {}, //callback when the map is done drawing
-    fills: {
-      defaultFill: '#ABDDA4' //the keys in this object map to the "fillKey" of [data] or [bubbles]
-    },
-    dataType: 'json', //for use with dataUrl, currently 'json' or 'csv'. CSV should have an `id` column
-    dataUrl: null, //if not null, datamaps will attempt to fetch this based on dataType ( default: json )
-    geographyConfig: {
-        dataUrl: null, //if not null, datamaps will fetch the map JSON (currently only supports topojson)
-        hideAntarctica: true,
-        borderWidth: 1,
-        borderOpacity: 1,
-        borderColor: '#FDFDFD',
-        popupTemplate: function(geography, data) { //this function should just return a string
-          return '<div class="hoverinfo"><strong>' + geography.properties.name + '</strong></div>';
-        },
-        popupOnHover: true, //disable the popup while hovering
-        highlightOnHover: true,
-        highlightFillColor: '#FC8D59',
-        highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2,
-        highlightBorderOpacity: 1
-    },
-    bubblesConfig: {
-        borderWidth: 2,
-        borderOpacity: 1,
-        borderColor: '#FFFFFF',
-        popupOnHover: true,
-        radius: null,
-        popupTemplate: function(geography, data) {
-          return '<div class="hoverinfo"><strong>' + data.name + '</strong></div>';
-        },
-        fillOpacity: 0.75,
-        animate: true,
-        highlightOnHover: true,
-        highlightFillColor: '#FC8D59',
-        highlightBorderColor: 'rgba(250, 15, 160, 0.2)',
-        highlightBorderWidth: 2,
-        highlightBorderOpacity: 1,
-        highlightFillOpacity: 0.85,
-        exitDelay: 100,
-        key: JSON.stringify
-    },
-    arcConfig: {
-      strokeColor: '#DD1C77',
-      strokeWidth: 1,
-      arcSharpness: 1,
-      animationSpeed: 600
-    }
-  };
-}
-
-
-function setProjection(){
-var zoom = new Datamap({
-  element: document.getElementById("zoom_map"),
-  scope: 'world',
-  // Zoom in on Africa
-  setProjection: function(element) {
-    var projection = d3.geo.equirectangular()
-      .center([23, -3])
-      .rotate([4.4, 0])
-      .scale(400)
-      .translate([element.offsetWidth / 2, element.offsetHeight / 2]);
-    var path = d3.geo.path()
-      .projection(projection);
-
-    return {path: path, projection: projection};
-  },
-  fills: {
-    defaultFill: "#ABDDA4",
-    gt50: colors(Math.random() * 20),
-    eq50: colors(Math.random() * 20),
-    lt25: colors(Math.random() * 10),
-    gt75: colors(Math.random() * 200),
-    lt50: colors(Math.random() * 20),
-    eq0: colors(Math.random() * 1),
-    pink: '#0fa0fa',
-    gt500: colors(Math.random() * 1)
-  },
-  data: {
-    'ZAF': { fillKey: 'gt50' },
-    'ZWE': { fillKey: 'lt25' },
-    'NGA': { fillKey: 'lt50' },
-    'MOZ': { fillKey: 'eq50' },
-    'MDG': { fillKey: 'eq50' },
-    'EGY': { fillKey: 'gt75' },
-    'TZA': { fillKey: 'gt75' },
-    'LBY': { fillKey: 'eq0' },
-    'DZA': { fillKey: 'gt500' },
-    'SSD': { fillKey: 'pink' },
-    'SOM': { fillKey: 'gt50' },
-    'GIB': { fillKey: 'eq50' },
-    'AGO': { fillKey: 'lt50' }
-  }
-});
-zoom.bubbles([
- {name: 'Bubble 1', latitude: 21.32, longitude: -7.32, radius: 45, fillKey: 'gt500'},
- {name: 'Bubble 2', latitude: 12.32, longitude: 27.32, radius: 25, fillKey: 'eq0'},
- {name: 'Bubble 3', latitude: 0.32, longitude: 23.32, radius: 35, fillKey: 'lt25'},
- {name: 'Bubble 4', latitude: -31.32, longitude: 23.32, radius: 55, fillKey: 'eq50'},
-], {
- popupTemplate: function(geo, data) {
-   return "<div class='hoverinfo'>Bubble for " + data.name + "";
- }
-});*/
-
 var select = document.getElementById("selectCountry1");
 var select2 = document.getElementById("selectCountry2");
 var pays1 = select.value;
 var pays2 = select2.value;
 
-
-
 var series = [
-        [pays1,80],[pays2,150]];
+    [pays1, 0],[pays2, 0]];
 
+// Datamaps expect data in format:
+var dataset = {};
 
-    // Datamaps expect data in format:
-    var dataset = {};
+// We need to colorize every country based on "numberOfWhatever"
+// colors should be uniq for every value.
+// For this purpose we create palette(using min/max series-value)
+var onlyValues = series.map(function(obj){ return obj[1]; });
+var minValue = Math.min.apply(null, onlyValues),
+        maxValue = Math.max.apply(null, onlyValues);
 
-    // We need to colorize every country based on "numberOfWhatever"
-    // colors should be uniq for every value.
-    // For this purpose we create palette(using min/max series-value)
-    var onlyValues = series.map(function(obj){ return obj[1]; });
-    var minValue = Math.min.apply(null, onlyValues),
-            maxValue = Math.max.apply(null, onlyValues);
+// create color palette function
+// color can be whatever you wish
+var paletteScale = d3.scale.linear()
+        .domain([minValue,maxValue])
+        .range(["#862d59","#00802b"]); // 
 
-    // create color palette function
-    // color can be whatever you wish
-    var paletteScale = d3.scale.linear()
-            .domain([minValue,maxValue])
-            .range(["#862d59","#00802b"]); // 
+// fill dataset in appropriate format
+series.forEach(function(item){ //
+    // item example value ["USA", 70]
+    var iso = item[0],
+            value = item[1];
+    dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
+});
 
-    // fill dataset in appropriate format
-    series.forEach(function(item){ //
-        // item example value ["USA", 70]
-        var iso = item[0],
-                value = item[1];
-        dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
-    });
-
-    // render map
-    new Datamap({
-        element: document.getElementById('container'),
-        projection: 'mercator', // big world map
-        // countries don't listed in dataset will be painted with this color
-        fills: { defaultFill: '#F5F5F5' },
-        data: dataset,
-        geographyConfig: {
-            borderColor: '#DEDEDE',
-            highlightBorderWidth: 2,
-            // don't change color on mouse hover
-            highlightFillColor: function(geo) {
-                return geo['fillColor'] || '#F5F5F5';
-            },
-            // only change border
-            highlightBorderColor: '#B7B7B7',
-            // show desired information in tooltip
-            popupTemplate: function(geo, data) {
-                // don't show tooltip if country don't present in dataset
-                if (!data) { return ; }
-                // tooltip content
-                return ['<div class="hoverinfo">',
-                    '<strong>', geo.properties.name, '</strong>',
-                    '<br>Count: <strong>', data.numberOfThings, '</strong>',
-                    '</div>'].join('');
-            }
+// render map
+var arcs = new Datamap({
+    element: document.getElementById('container'),
+    element2: document.getElementById("arcs"),
+    element3: document.getElementById("bubbles"),
+    projection: 'mercator', // big world map
+    // countries don't listed in dataset will be painted with this color
+    fills: { defaultFill: '#B4BCC4', win: '#0fa0fa' },
+    data: dataset,
+    geographyConfig: {
+        borderColor: '#DEDEDE',
+        highlightBorderWidth: 2,
+        // don't change color on mouse hover
+        highlightFillColor: function(geo) {
+            return geo['fillColor'] || '#F5F5F5';
+        },
+        // only change border
+        highlightBorderColor: '#B7B7B7',
+        // show desired information in tooltip
+        popupTemplate: function(geo, data) {
+            // don't show tooltip if country don't present in dataset
+            if (!data) { return ; }
+            // tooltip content
+            return ['<div class="hoverinfo">',
+                '<strong>', geo.properties.name, '</strong>',
+                '<br>Count of mentions: <strong>', data.numberOfThings, '</strong>',
+                '</div>'].join('');
         }
-    });
-    document.getElementsByTagName("svg")[0].style.overflow="visible";
+    }
+});
+
+
+document.getElementsByTagName("svg")[0].style.overflow="visible";
+
+var pays11 = select.options[select.selectedIndex].text;
+var pays22 = select2.options[select2.selectedIndex].text;
+
     impact(select.value, select2.value);
-    var pays11 = select.options[select.selectedIndex].text;
-	var pays22 = select2.options[select2.selectedIndex].text;
-
-	document.getElementById('POS_C1_C2').innerHTML = "Positive Impact of "+pays11+" on "+pays22+ " :";
-	document.getElementById('NEG_C1_C2').innerHTML = "Negative Impact of "+pays11+" on "+pays22+ " :";
-	document.getElementById('POS_C2_C1').innerHTML = "Positive Impact of "+pays22+" on "+pays11+ " :";
-	document.getElementById('NEG_C2_C1').innerHTML = "Negative Impact of "+pays22+" on "+pays11+ " :";
-
 }
 
 function data(){
@@ -2184,6 +2066,8 @@ function data(){
         }
     }
 }
+
+
 var select = document.getElementById("selectCountry1");
 var select2 = document.getElementById("selectCountry2");
 
@@ -2203,163 +2087,162 @@ for(var j = 0; j < data["objects"]["world"]["geometries"].length; j++) {
     select2.appendChild(el2);
 }
 
-
 }
 
 function impact(country1, country2) {
             var convCountry = {'ABW': 'AW',
-                     'AFG': 'AF',
-                     'AGO': 'AO',
-                     'AIA': 'AI',
-                     'ALB': 'AL',
-                     'AND': 'AD',
-                     'ARE': 'AE',
-                     'ARG': 'AR',
-                     'ARM': 'AM',
-                     'ASM': 'AS',
-                     'ATA': 'AQ',
-                     'ATF': 'TF',
-                     'ATG': 'AG',
-                     'AUS': 'AU',
-                     'AUT': 'AT',
-                     'AZE': 'AZ',
-                     'BDI': 'BI',
-                     'BEL': 'BE',
-                     'BEN': 'BJ',
-                     'BES': 'BQ',
-                     'BFA': 'BF',
-                     'BGD': 'BD',
-                     'BGR': 'BG',
-                     'BHR': 'BH',
-                     'BHS': 'BS',
-                     'BIH': 'BA',
-                     'BLM': 'BL',
-                     'BLR': 'BY',
-                     'BLZ': 'BZ',
-                     'BMU': 'BM',
-                     'BOL': 'BO',
-                     'BRA': 'BR',
-                     'BRB': 'BB',
-                     'BRN': 'BN',
-                     'BTN': 'BT',
-                     'BVT': 'BV',
-                     'BWA': 'BW',
-                     'CAF': 'CF',
-                     'CAN': 'CA',
-                     'CCK': 'CC',
-                     'CHE': 'CH',
-                     'CHL': 'CL',
-                     'CHN': 'CN',
-                     'CIV': 'CI',
-                     'CMR': 'CM',
-                     'COD': 'CD',
-                     'COG': 'CG',
-                     'COK': 'CK',
-                     'COL': 'CO',
-                     'COM': 'KM',
-                     'CPV': 'CV',
-                     'CRI': 'CR',
-                     'CUB': 'CU',
-                     'CUW': 'CW',
-                     'CXR': 'CX',
-                     'CYM': 'KY',
-                     'CYP': 'CY',
-                     'CZE': 'CZ',
-                     'DEU': 'DE',
-                     'DJI': 'DJ',
-                     'DMA': 'DM',
-                     'DNK': 'DK',
-                     'DOM': 'DO',
-                     'DZA': 'DZ',
-                     'ECU': 'EC',
-                     'EGY': 'EG',
-                     'ERI': 'ER',
-                     'ESH': 'EH',
-                     'ESP': 'ES',
-                     'EST': 'EE',
-                     'ETH': 'ET',
-                     'FIN': 'FI',
-                     'FJI': 'FJ',
-                     'FLK': 'FK',
-                     'FRA': 'FR',
-                     'FRO': 'FO',
-                     'FSM': 'FM',
-                     'GAB': 'GA',
-                     'GBR': 'GB',
-                     'GEO': 'GE',
-                     'GGY': 'GG',
-                     'GHA': 'GH',
-                     'GIB': 'GI',
-                     'GIN': 'GN',
-                     'GLP': 'GP',
-                     'GMB': 'GM',
-                     'GNB': 'GW',
-                     'GNQ': 'GQ',
-                     'GRC': 'GR',
-                     'GRD': 'GD',
-                     'GRL': 'GL',
-                     'GTM': 'GT',
-                     'GUF': 'GF',
-                     'GUM': 'GU',
-                     'GUY': 'GY',
-                     'HKG': 'HK',
-                     'HMD': 'HM',
-                     'HND': 'HN',
-                     'HRV': 'HR',
-                     'HTI': 'HT',
-                     'HUN': 'HU',
-                     'IDN': 'ID',
-                     'IMN': 'IM',
-                     'IND': 'IN',
-                     'IOT': 'IO',
-                     'IRL': 'IE',
-                     'IRN': 'IR',
-                     'IRQ': 'IQ',
-                     'ISL': 'IS',
-                     'ISR': 'IL',
-                     'ITA': 'IT',
-                     'JAM': 'JM',
-                     'JEY': 'JE',
-                     'JOR': 'JO',
-                     'JPN': 'JP',
-                     'KAZ': 'KZ',
-                     'KEN': 'KE',
-                     'KGZ': 'KG',
-                     'KHM': 'KH',
-                     'KIR': 'KI',
-                     'KNA': 'KN',
-                     'KOR': 'KR',
-                     'KWT': 'KW',
-                     'LAO': 'LA',
-                     'LBN': 'LB',
-                     'LBR': 'LR',
-                     'LBY': 'LY',
-                     'LCA': 'LC',
-                     'LIE': 'LI',
-                     'LKA': 'LK',
-                     'LSO': 'LS',
-                     'LTU': 'LT',
-                     'LUX': 'LU',
-                     'LVA': 'LV',
-                     'MAC': 'MO',
-                     'MAF': 'MF',
-                     'MAR': 'MA',
-                     'MCO': 'MC',
-                     'MDA': 'MD',
-                     'MDG': 'MG',
-                     'MDV': 'MV',
-                     'MEX': 'MX',
-                     'MHL': 'MH',
-                     'MKD': 'MK',
-                     'MLI': 'ML',
-                     'MLT': 'MT',
-                     'MMR': 'MM',
-                     'MNE': 'ME',
-                     'MNG': 'MN',
-                     'MNP': 'MP',
-                     'MOZ': 'MZ',
-                     'MRT': 'MR',
-                     'MSR': 'MS',
+                    'AFG': 'AF',
+                    'AGO': 'AO',
+                    'AIA': 'AI',
+                    'ALB': 'AL',
+                    'AND': 'AD',
+                    'ARE': 'AE',
+                    'ARG': 'AR',
+                    'ARM': 'AM',
+                    'ASM': 'AS',
+                    'ATA': 'AQ',
+                    'ATF': 'TF',
+                    'ATG': 'AG',
+                    'AUS': 'AU',
+                    'AUT': 'AT',
+                    'AZE': 'AZ',
+                    'BDI': 'BI',
+                    'BEL': 'BE',
+                    'BEN': 'BJ',
+                    'BES': 'BQ',
+                    'BFA': 'BF',
+                    'BGD': 'BD',
+                    'BGR': 'BG',
+                    'BHR': 'BH',
+                    'BHS': 'BS',
+                    'BIH': 'BA',
+                    'BLM': 'BL',
+                    'BLR': 'BY',
+                    'BLZ': 'BZ',
+                    'BMU': 'BM',
+                    'BOL': 'BO',
+                    'BRA': 'BR',
+                    'BRB': 'BB',
+                    'BRN': 'BN',
+                    'BTN': 'BT',
+                    'BVT': 'BV',
+                    'BWA': 'BW',
+                    'CAF': 'CF',
+                    'CAN': 'CA',
+                    'CCK': 'CC',
+                    'CHE': 'CH',
+                    'CHL': 'CL',
+                    'CHN': 'CN',
+                    'CIV': 'CI',
+                    'CMR': 'CM',
+                    'COD': 'CD',
+                    'COG': 'CG',
+                    'COK': 'CK',
+                    'COL': 'CO',
+                    'COM': 'KM',
+                    'CPV': 'CV',
+                    'CRI': 'CR',
+                    'CUB': 'CU',
+                    'CUW': 'CW',
+                    'CXR': 'CX',
+                    'CYM': 'KY',
+                    'CYP': 'CY',
+                    'CZE': 'CZ',
+                    'DEU': 'DE',
+                    'DJI': 'DJ',
+                    'DMA': 'DM',
+                    'DNK': 'DK',
+                    'DOM': 'DO',
+                    'DZA': 'DZ',
+                    'ECU': 'EC',
+                    'EGY': 'EG',
+                    'ERI': 'ER',
+                    'ESH': 'EH',
+                    'ESP': 'ES',
+                    'EST': 'EE',
+                    'ETH': 'ET',
+                    'FIN': 'FI',
+                    'FJI': 'FJ',
+                    'FLK': 'FK',
+                    'FRA': 'FR',
+                    'FRO': 'FO',
+                    'FSM': 'FM',
+                    'GAB': 'GA',
+                    'GBR': 'GB',
+                    'GEO': 'GE',
+                    'GGY': 'GG',
+                    'GHA': 'GH',
+                    'GIB': 'GI',
+                    'GIN': 'GN',
+                    'GLP': 'GP',
+                    'GMB': 'GM',
+                    'GNB': 'GW',
+                    'GNQ': 'GQ',
+                    'GRC': 'GR',
+                    'GRD': 'GD',
+                    'GRL': 'GL',
+                    'GTM': 'GT',
+                    'GUF': 'GF',
+                    'GUM': 'GU',
+                    'GUY': 'GY',
+                    'HKG': 'HK',
+                    'HMD': 'HM',
+                    'HND': 'HN',
+                    'HRV': 'HR',
+                    'HTI': 'HT',
+                    'HUN': 'HU',
+                    'IDN': 'ID',
+                    'IMN': 'IM',
+                    'IND': 'IN',
+                    'IOT': 'IO',
+                    'IRL': 'IE',
+                    'IRN': 'IR',
+                    'IRQ': 'IQ',
+                    'ISL': 'IS',
+                    'ISR': 'IL',
+                    'ITA': 'IT',
+                    'JAM': 'JM',
+                    'JEY': 'JE',
+                    'JOR': 'JO',
+                    'JPN': 'JP',
+                    'KAZ': 'KZ',
+                    'KEN': 'KE',
+                    'KGZ': 'KG',
+                    'KHM': 'KH',
+                    'KIR': 'KI',
+                    'KNA': 'KN',
+                    'KOR': 'KR',
+                    'KWT': 'KW',
+                    'LAO': 'LA',
+                    'LBN': 'LB',
+                    'LBR': 'LR',
+                    'LBY': 'LY',
+                    'LCA': 'LC',
+                    'LIE': 'LI',
+                    'LKA': 'LK',
+                    'LSO': 'LS',
+                    'LTU': 'LT',
+                    'LUX': 'LU',
+                    'LVA': 'LV',
+                    'MAC': 'MO',
+                    'MAF': 'MF',
+                    'MAR': 'MA',
+                    'MCO': 'MC',
+                    'MDA': 'MD',
+                    'MDG': 'MG',
+                    'MDV': 'MV',
+                    'MEX': 'MX',
+                    'MHL': 'MH',
+                    'MKD': 'MK',
+                    'MLI': 'ML',
+                    'MLT': 'MT',
+                    'MMR': 'MM',
+                    'MNE': 'ME',
+                    'MNG': 'MN',
+                    'MNP': 'MP',
+                    'MOZ': 'MZ',
+                    'MRT': 'MR',
+                    'MSR': 'MS',
                     'MTQ': 'MQ',
                     'MUS': 'MU',
                     'MWI': 'MW',
@@ -2455,8 +2338,10 @@ function impact(country1, country2) {
                     'ZMB': 'ZM',
                     'ZWE': 'ZW'};
 
-                var newURL='http://localhost:5000/'+convCountry[country1]+'/'+convCountry[country2]+'/201703';
+                var month = document.getElementsByTagName('input')[0].value;
+                month = month.replace("-", "")
 
+                var newURL='http://localhost:5000/'+convCountry[country1]+'/'+convCountry[country2]+'/'+ month;
 
                 $.ajax({
                      url: newURL,
@@ -2469,26 +2354,140 @@ function impact(country1, country2) {
                          document.getElementById("results").style.display="none";
                      },
                      success: function (data, textStatus, xhr) {
-                        document.getElementById("imagerefresh").style.display="none";
-                         document.getElementById("results").style.display="block";
-                         console.log(data);
-                         document.getElementById("imp1_C1_C2_pos").value=data["imp1_C1_C2_pos"]
-                         document.getElementById("imp1_C1_C2_neg").value=data["imp1_C1_C2_neg"]
-                         document.getElementById("imp1_C2_C1_pos").value=data["imp1_C2_C1_pos"]
-                         document.getElementById("imp1_C2_C1_neg").value=data["imp1_C2_C1_neg"]
+                        d3.select("svg").remove();
+                        var select = document.getElementById("selectCountry1");
+                        var select2 = document.getElementById("selectCountry2");
+                        var pays1 = select.value;
+                        var pays2 = select2.value;
+                        var count1 = data["mention_C1_C2"];
+                        var count2 = data["mention_C2_C1"];
 
-                         /*if (data["imp1_C1_C2_pos"] > data["imp1_C1_C2_neg"]){
-                         	document.getElementById("imp1_C1_C2_pos").style.font_weight="900";
-                         	document.getElementById("imp1_C1_C2_pos").style.font_size="20pt";
-                         }
-                         else{
-							document.getElementById("imp1_C1_C2_neg").style.font_weight="900";
-							document.getElementById("imp1_C1_C2_neg").style.font_size="20pt";
+                    var series = [
+                            [pays1, count1],[pays2, count2]];
 
-                         }*/
+                    // Datamaps expect data in format:
+                    var dataset = {};
+
+                    // We need to colorize every country based on "numberOfWhatever"
+                    // colors should be uniq for every value.
+                    // For this purpose we create palette(using min/max series-value)
+                    var onlyValues = series.map(function(obj){ return obj[1]; });
+                    var minValue = Math.min.apply(null, onlyValues),
+                            maxValue = Math.max.apply(null, onlyValues);
+
+                    // create color palette function
+                    // color can be whatever you wish
+                    var paletteScale = d3.scale.linear()
+                            .domain([minValue,maxValue])
+                            .range(["#862d59","#00802b"]); // 
+
+                    // fill dataset in appropriate format
+                    series.forEach(function(item){ //
+                    // item example value ["USA", 70]
+                    var iso = item[0],
+                            value = item[1];
+                    dataset[iso] = { numberOfThings: value, fillColor: paletteScale(value) };
+                    });
+
+                    // render map
+                    var arcs = new Datamap({
+                        element: document.getElementById('container'),
+                        element2: document.getElementById("arcs"),
+                        element3: document.getElementById("bubbles"),
+                        projection: 'mercator', // big world map
+                        // countries don't listed in dataset will be painted with this color
+                        fills: { defaultFill: '#B4BCC4', win: '#0fa0fa' },
+                        data: dataset,
+                        geographyConfig: {
+                            borderColor: '#DEDEDE',
+                            highlightBorderWidth: 2,
+                            // don't change color on mouse hover
+                            highlightFillColor: function(geo) {
+                                return geo['fillColor'] || '#F5F5F5';
+                            },
+                            // only change border
+                            highlightBorderColor: '#B7B7B7',
+                            // show desired information in tooltip
+                            popupTemplate: function(geo, data) {
+                                // don't show tooltip if country don't present in dataset
+                                if (!data) { return ; }
+                                // tooltip content
+                                return ['<div class="hoverinfo">',
+                                    '<strong>', geo.properties.name, '</strong>',
+                                    '<br>Count of mentions: <strong>', data.numberOfThings, '</strong>',
+                                    '</div>'].join('');
+                            }
+                        }
+                    });
+
+
+                    document.getElementsByTagName("svg")[0].style.overflow="visible";
+                    
+                    var pays11 = select.options[select.selectedIndex].text;
+                    var pays22 = select2.options[select2.selectedIndex].text;
+
+                     arcs.arc([
+                  {
+                    origin: pays1,
+                    destination: pays2
+                  }
+                  ],  {strokeWidth: 2, strokeColor: 'rgba(22, 96, 171, 1)', arcSharpness: 0.5});
+
+                    document.getElementById('POS_C1_C2').innerHTML = "Positive Impact of "+pays11+" on "+pays22+ " :";
+                    document.getElementById('NEG_C1_C2').innerHTML = "Negative Impact of "+pays11+" on "+pays22+ " :";
+                    document.getElementById('POS_C2_C1').innerHTML = "Positive Impact of "+pays22+" on "+pays11+ " :";
+                    document.getElementById('NEG_C2_C1').innerHTML = "Negative Impact of "+pays22+" on "+pays11+ " :";
+
+
+                    document.getElementById("imagerefresh").style.display="none";
+                    document.getElementById("results").style.display="block";
+                    document.getElementById("POS_C1_C2").style.display="block";
+                    document.getElementById("NEG_C1_C2").style.display="block";
+                    document.getElementById("POS_C2_C1").style.display="block";
+                    document.getElementById("NEG_C2_C1").style.display="block";
+                    console.log(data);
+                    document.getElementById("imp1_C1_C2_pos").value=data["imp1_C1_C2_pos"]
+                    document.getElementById("imp1_C1_C2_neg").value=data["imp1_C1_C2_neg"]
+                    document.getElementById("imp1_C2_C1_pos").value=data["imp1_C2_C1_pos"]
+                    document.getElementById("imp1_C2_C1_neg").value=data["imp1_C2_C1_neg"]
+                    
+
+
+                     if (data["imp1_C1_C2_pos"] > data["imp1_C1_C2_neg"]){
+                     	document.getElementById("imp1_C1_C2_pos").style.fontWeight="bold";
+                     	document.getElementById("imp1_C1_C2_pos").style.fontSize="15pt";
+                        document.getElementById("imp1_C1_C2_neg").style.fontWeight="normal";
+                        document.getElementById("imp1_C1_C2_neg").style.fontSize="12pt";
+
+                     }
+
+                     if (data["imp1_C1_C2_pos"] < data["imp1_C1_C2_neg"]) {
+						document.getElementById("imp1_C1_C2_neg").style.fontWeight="bold";
+						document.getElementById("imp1_C1_C2_neg").style.fontSize="15pt";
+                        document.getElementById("imp1_C1_C2_pos").style.fontWeight="normal";
+                        document.getElementById("imp1_C1_C2_pos").style.fontSize="12pt";
+                     }
+
+                     if (data["imp1_C2_C1_pos"] > data["imp1_C2_C1_neg"]){
+                        document.getElementById("imp1_C2_C1_pos").style.fontWeight="bold";
+                        document.getElementById("imp1_C2_C1_pos").style.fontSize="15pt";
+                        document.getElementById("imp1_C2_C1_neg").style.fontWeight="normal";
+                        document.getElementById("imp1_C2_C1_neg").style.fontSize="12pt";
+
+                     }
+
+                     if (data["imp1_C2_C1_pos"] < data["imp1_C2_C1_neg"]) {
+                        document.getElementById("imp1_C2_C1_neg").style.fontWeight="bold";
+                        document.getElementById("imp1_C2_C1_neg").style.fontSize="15pt";
+                        document.getElementById("imp1_C2_C1_pos").style.fontWeight="normal";
+                        document.getElementById("imp1_C2_C1_pos").style.fontSize="12pt";
+                     }
+
                      },
                      error: function (xhr, textStatus, errorThrown) {
                          console.log('Error in Operation');
                      }
                  });
+
+
 }
